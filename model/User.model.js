@@ -232,6 +232,10 @@ const bankDetailsSchema = new mongoose.Schema({
   pannumber: {
     type: String,
     required: true
+  },
+    bankaccnumber: {
+    type: String,
+    required: true
   }
 });
 

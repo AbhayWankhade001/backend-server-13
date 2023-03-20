@@ -420,7 +420,7 @@ router.post('/admin/login', async (req, res) => {
 
   console.log('Token:', token); // Debugging purposes only
  res.send(token);
-  res.send('Admin logged in successfully.');
+//   res.send('Admin logged in successfully.');
 });
 
 

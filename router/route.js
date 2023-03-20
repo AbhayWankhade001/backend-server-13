@@ -419,7 +419,7 @@ router.post('/admin/login', async (req, res) => {
   res.cookie('token', token);
 
   console.log('Token:', token); // Debugging purposes only
-
+ res.send(token);
   res.send('Admin logged in successfully.');
 });
 

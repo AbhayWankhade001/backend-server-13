@@ -83,6 +83,8 @@ router2.post("/addBankDetails", async (req, res) => {
       bankDetails.branchname = req.body.branchname;
       bankDetails.ifsc = req.body.ifsc;
       bankDetails.pannumber = req.body.pannumber;
+      bankDetails.bankaccnumber = req.body.bankaccnumber;
+
     } else {
       // Create a new bank details object and populate it with form data
       bankDetails = new BankDetails({
@@ -95,6 +97,7 @@ router2.post("/addBankDetails", async (req, res) => {
         branchname: req.body.branchname,
         ifsc: req.body.ifsc,
         pannumber: req.body.pannumber,
+        bankaccnumber:req.body.bankaccnumber,
       });
     }
 

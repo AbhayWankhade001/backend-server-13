@@ -1,6 +1,6 @@
 import express from "express";
 import { loginUser, verifyToken } from "../middleware/auth.js";
-import User,{Employee} from "../model/User.model.js";
+import User,{Employee , Admin} from "../model/User.model.js";
 import mongoose from "mongoose";
 import config from "./config.js";
 import jwt from 'jsonwebtoken';
@@ -141,6 +141,40 @@ router2.get("/bankDetails", async (req, res) => {
   }
 });
 
+
+
+
+
+router2.get("/bankDetailsadmin", async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1] || req.cookies.token;
+  if (!token) {
+    return res.status(401).send('Unauthorized');
+  }
+
+  try {
+    const decodedToken = jwt.verify(token, config.JWT_SECRET);
+    console.log("Decoded token:", decodedToken); // Debugging purposes only
+    const adminId = decodedToken.adminId;
+  
+    // Check if the admin with the given ID exists
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      console.log("Admin not found with ID:", adminId);
+      return res.status(404).json({ error: "Admin not found" });
+    }
+
+    // Retrieve bank details of all employees
+    const bankDetails = await BankDetails.find();
+
+    // Return the bank details as a response
+    console.log("Bank details retrieved successfully");
+    res.send(bankDetails);
+  } catch (err) {
+    console.log("Error retrieving bank details:", err.message);
+    console.log('Error decoding JWT token:', err.message);
+    return res.status(401).send('Unauthorized');
+  }
+});
 
 
 export default router2;

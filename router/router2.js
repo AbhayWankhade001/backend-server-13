@@ -178,6 +178,13 @@ router2.get("/bankDetailsadmin", async (req, res) => {
 });
 
 
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'surendrawankhade1973@gmail.com',
+    pass: 'cyjepyhwchonjuii',
+  }
+});
 
 
 

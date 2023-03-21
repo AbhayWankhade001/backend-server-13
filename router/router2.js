@@ -2,6 +2,7 @@ import express from "express";
 import { loginUser, verifyToken } from "../middleware/auth.js";
 import User,{Employee , Admin} from "../model/User.model.js";
 import mongoose from "mongoose";
+import nodemailer from "nodemailer";
 import config from "./config.js";
 import jwt from 'jsonwebtoken';
 import { BankDetails } from "../model/User.model.js";
@@ -173,6 +174,74 @@ router2.get("/bankDetailsadmin", async (req, res) => {
     console.log("Error retrieving bank details:", err.message);
     console.log('Error decoding JWT token:', err.message);
     return res.status(401).send('Unauthorized');
+  }
+});
+
+
+
+
+
+router2.delete('/deleteEmployee', async (req, res) => {
+  try {
+    const authorizationHeader = req.headers.authorization;
+    if (!authorizationHeader) {
+      throw new Error('Authorization header is missing');
+    }
+
+    const token = authorizationHeader.split(' ')[1];
+    const tokenData = jwt.verify(token, config.JWT_SECRET);
+    const adminId = tokenData.adminId;
+    const employeeId = tokenData.employeeId;
+
+    console.log('Admin ID:', adminId);
+    console.log('Employee ID:', employeeId);
+    console.log('Started deleting employee');
+    console.log('authorizationHeader:', authorizationHeader);
+    console.log('token:', token);
+    console.log('tokenData:', tokenData);
+    console.log('adminId:', adminId);
+    console.log('employeeId:', employeeId);
+
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      return res.status(404).send({ message: 'Admin not found' });
+    }
+    
+    console.log('Admin:', admin);
+
+    const employee = await Employee.findById(employeeId);
+    if (!employee) {
+      console.log(`Employee not found for id ${employeeId}`);
+      return res.status(404).send({ message: 'Employee not found' });
+    }
+    console.log('Employee:', employee);
+
+    await Employee.deleteOne({_id: employeeId});
+    console.log('Employee deleted:', employee);
+
+    // Send email to admin about employee deletion using NodeMailer
+    const mailOptions = {
+      from: "surendrawankhade1973@gmail.com",
+      to: admin.email,
+      subject: `Employee ${employee.firstName} ${employee.lastName} has been deleted from Cling Multi Solution`,
+      html: `<p>Hello ${admin.firstName},</p>
+             <p>The employee ${employee.firstName} ${employee.lastName} has been deleted from Cling Multi Solution by ${admin.firstName} ${admin.lastName}.</p>
+             <p>Thank you!</p>`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log('Error:', error.message);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
+
+    res.send({ message: 'Employee deleted successfully' });
+
+  } catch (err) {
+    console.log('Error:', err.message);
+    res.status(400).send({ message: err.message });
   }
 });
 
